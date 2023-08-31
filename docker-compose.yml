@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  cakephp4-tutorial-mysql:
+    container_name: cakephp4-tutorial-mysql
+    image: mysql:5.7
+    platform: linux/amd64
+    ports:
+      - '61983:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+
+  cakephp4-tutorial-api:
+    container_name: cakephp4-tutorial-api
+    build: .
+    platform: linux/amd64
+    links:
+      - cakephp4-tutorial-mysql
+    ports:
+      - '61981:80'
+    volumes:
+      - ./backend:/var/www/html
+
+  cakephp4-tutorial-phpmyadmin:
+    container_name: cakephp4-tutorial-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    platform: linux/amd64
+    links:
+      - cakephp4-tutorial-mysql
+    ports:
+      - '61982:80'
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: cakephp4-tutorial-mysql
+      PMA_USER: root
+      PMA_PASSWORD: password
